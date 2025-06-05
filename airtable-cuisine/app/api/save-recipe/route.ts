@@ -1,4 +1,3 @@
-// app/api/save-recipe/route.ts
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -17,7 +16,8 @@ export async function POST(request: Request) {
       difficulty,
       restrictions,
       ingredients,
-      steps
+      steps,
+      nutritionAnalysis
     } = await request.json();
 
     // ─── Lookup ou création des restrictions ─────────────────────────────────────
@@ -32,8 +32,8 @@ export async function POST(request: Request) {
         )
       );
       restrictionIds = lists
-        .map(l => l.records?.[0]?.id)
-        .filter((id): id is string => Boolean(id));
+      .map(l => l.records?.[0]?.id)
+      .filter((id): id is string => Boolean(id));
     }
 
     // ─── Lookup ou création des ingrédients & collecte de leurs IDs ──────────────
@@ -76,8 +76,8 @@ export async function POST(request: Request) {
       PrepTime:    Number(prepTime),
       CookTime:    Number(cookTime),
       Difficulty:  difficulty,
-      // remplissage du champ linked-record **Ingredients**
       Ingredients: ingredientIds,
+      NutritionAnalysis: nutritionAnalysis,
     };
     if (restrictionIds.length) {
       recFields.DietaryRestrictions = restrictionIds;

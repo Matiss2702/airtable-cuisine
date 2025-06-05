@@ -33,11 +33,11 @@ export default function RecipesPage() {
   const [usedIngredients, setUsedIngredients] = useState<string[]>([]);
   const [usedRestrictions, setUsedRestrictions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-
+  
   // recettes sauvegardées
   const [savedRecipes, setSavedRecipes] = useState<SavedRecipe[]>([]);
   const [expanded, setExpanded] = useState<ExpandedMap>({});
-
+  
   // résultat de la génération
   const [displayRecipe, setDisplayRecipe] = useState<string | null>(null);
 
@@ -74,10 +74,13 @@ export default function RecipesPage() {
     setDisplayRecipe(null);
 
     const prompt = `
-    EN FRANÇAIS je veux une recette de cuisine avec les ingrédients suivants et les restrictions éventuelles.
+    EN FRANÇAIS je veux une recette de cuisine avec les ingrédients suivants et les restrictions éventuelles et une analyse nutritionnelle complète. 
     Le JSON doit respecter ce format, dans "steps" il faut mettre les étapes de la recette, et dans "description" un texte descriptif de la recette, et "name" doit être le nom de la recette.
-    je veux que pour le step ce soit bien detaillé, avec des phrases complètes et pas juste une liste d'actions.:
-    { 
+    je veux que pour le step ce soit bien detaillé, avec des phrases complètes et pas juste une liste d'actions. le JSON doit etre au format suivant et NE DOIT contenir aucun texte avant ou après.
+    Tous les champs numériques doivent être des nombres sans unités.
+    Les champs vitamins et minerals doivent être inclus dans nutrition.
+    Les ingrédients doivent être listés sous forme de noms simples, **sans quantité, sans unité**.Exemples valides : "riz", "farine", "beurre".
+    {
       "name": string,
       "description": string,
       "prepTime": number,
@@ -85,7 +88,15 @@ export default function RecipesPage() {
       "difficulty": "Easy"|"Medium"|"Hard",
       "restrictions": string[],
       "ingredients": string[],
-      "steps": string[]
+      "steps": string[],
+      "nutrition": {
+        "calories": number,
+        "proteins": number,
+        "carbohydrates": number,
+        "fats": number,
+        "vitamins": { [nom: string]: string },
+        "minerals": { [nom: string]: string }
+      }
     }
     Fin JSON.
 
@@ -103,31 +114,36 @@ export default function RecipesPage() {
       const start = content.indexOf('{');
       const end   = content.lastIndexOf('}');
       content = content.slice(start, end + 1);
-      const payload = JSON.parse(content) as {
-        name: string;
-        description: string;
-        prepTime: number;
-        cookTime: number;
-        difficulty: string;
-        restrictions: string[];
-        ingredients: string[];
-        steps: string[];
-      };
+      const payload = JSON.parse(content);
 
-      // affichage intermédiaire
+      const nutrition = payload.nutrition || {};
+      const vitamins = nutrition.vitamins || payload.vitamins || {};
+      const minerals = nutrition.minerals || payload.minerals || {};
+
+      const nutritionSummary = `
+        Calories: ${nutrition.calories ?? payload.calories} kcal
+        Protéines: ${nutrition.proteins ?? payload.proteins} g
+        Glucides: ${nutrition.carbohydrates ?? payload.carbohydrates} g
+        Lipides: ${nutrition.fats ?? payload.fats} g
+        Vitamines: ${Object.entries(vitamins).map(([k, v]) => `${k}: ${v}`).join(', ') || 'N/A'}
+        Minéraux: ${Object.entries(minerals).map(([k, v]) => `${k}: ${v}`).join(', ') || 'N/A'}
+      `.trim();
+
       const lines = [
         `🍽️ Recette : ${payload.name}`,
         `📜 Description : ${payload.description}`,
         `⏱️ Prépa : ${payload.prepTime} min`,
         `🔥 Cuisson : ${payload.cookTime} min`,
         `💪 Difficulté : ${payload.difficulty}`,
-        payload.restrictions.length
-          ? `🚫 Restrictions : ${payload.restrictions.join(', ')}`
-          : null,
+        payload.restrictions.length 
+        ? `🚫 Restrictions : ${payload.restrictions.join(', ')}` 
+        : null,
         `📝 Ingrédients :`,
         ...payload.ingredients.map(i => `   • ${i}`),
         `👩‍🍳 Étapes :`,
         ...payload.steps.map((s, i) => `   ${i + 1}. ${s}`),
+        `📊 Analyse nutritionnelle :`,
+        nutritionSummary,
       ].filter(Boolean).join('\n');
       setDisplayRecipe(lines);
 
@@ -135,7 +151,7 @@ export default function RecipesPage() {
       const saveRes = await fetch('/api/save-recipe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ ...payload, nutritionAnalysis: nutritionSummary }),
       });
       const saveJson = await saveRes.json();
       if (saveJson.success) {
@@ -170,13 +186,13 @@ export default function RecipesPage() {
           <div>
             <Label className="text-lg font-semibold">Ajouter un ingrédient</Label>
             <div className="flex gap-2 mt-2">
-              <Input
-                list="ings"
-                value={selectedIngredient}
-                onChange={e => setSelectedIngredient(e.target.value)}
-                placeholder="Ingrédient"
-                className="flex-1"
-              />
+              <Input 
+              list="ings" 
+              value={selectedIngredient} 
+              onChange={e => setSelectedIngredient(e.target.value)} 
+              placeholder="Ingrédient" 
+              className="flex-1"
+            />
               <datalist id="ings">{ingredients.map(i => <option key={i.id} value={i.name} />)}</datalist>
               <Button onClick={addIngredient} className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
                 Ajouter
@@ -187,12 +203,12 @@ export default function RecipesPage() {
           <div>
             <Label className="text-lg font-semibold">Ajouter une restriction</Label>
             <div className="flex gap-2 mt-2">
-              <Input
-                list="ress"
-                value={selectedRestriction}
-                onChange={e => setSelectedRestriction(e.target.value)}
-                placeholder="Restriction"
-                className="flex-1"
+              <Input 
+              list="ress" 
+              value={selectedRestriction} 
+              onChange={e => setSelectedRestriction(e.target.value)} 
+              placeholder="Restriction" 
+              className="flex-1" 
               />
               <datalist id="ress">{restrictions.map(r => <option key={r.id} value={r.name} />)}</datalist>
               <Button onClick={addRestriction} className="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded">
@@ -227,10 +243,10 @@ export default function RecipesPage() {
           </div>
           {/* Boutons */}
           <div className="flex gap-3">
-            <Button
-              onClick={handleSubmit}
-              disabled={loading || !usedIngredients.length}
-              className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-bold px-6 py-3 rounded-lg"
+            <Button 
+            onClick={handleSubmit} 
+            disabled={loading || !usedIngredients.length} 
+            className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-bold px-6 py-3 rounded-lg"
             >
               {loading ? <><Loader2 className="animate-spin mr-2" />Chargement…</> : 'Générer recette'}
             </Button>
