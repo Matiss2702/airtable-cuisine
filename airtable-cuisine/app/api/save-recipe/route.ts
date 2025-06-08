@@ -5,7 +5,7 @@ export async function POST(request: Request) {
   const API_KEY      = process.env.AIRTABLE_API_KEY!;
   const TAB_REC      = 'Recipes';
   const TAB_ING      = 'Ingredients';
-  const TAB_RESTR    = 'DietaryRestrictions';
+  const TAB_RESTR    = 'Restrictions';
   const TAB_LINK_ING = 'Recipe_Ingredients';
 
   try {
@@ -17,7 +17,8 @@ export async function POST(request: Request) {
       restrictions,
       ingredients,
       steps,
-      nutritionAnalysis
+      nutritionAnalysis,
+      servings
     } = await request.json();
 
     // ─── Lookup ou création des restrictions ─────────────────────────────────────
@@ -78,9 +79,10 @@ export async function POST(request: Request) {
       Difficulty:  difficulty,
       Ingredients: ingredientIds,
       NutritionAnalysis: nutritionAnalysis,
+      Servings:    Number(servings),
     };
     if (restrictionIds.length) {
-      recFields.DietaryRestrictions = restrictionIds;
+      recFields.Restrictions = restrictionIds;
     }
 
     const createRes = await fetch(

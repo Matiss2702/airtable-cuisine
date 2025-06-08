@@ -23,22 +23,16 @@ type SavedRecipe = {
 type ExpandedMap = Record<string, boolean>;
 
 export default function RecipesPage() {
-  // listes statiques
   const [ingredients, setIngredients] = useState<{ id: string; name: string }[]>([]);
   const [restrictions, setRestrictions] = useState<{ id: string; name: string }[]>([]);
-
-  // form state
   const [selectedIngredient, setSelectedIngredient] = useState('');
   const [selectedRestriction, setSelectedRestriction] = useState('');
   const [usedIngredients, setUsedIngredients] = useState<string[]>([]);
   const [usedRestrictions, setUsedRestrictions] = useState<string[]>([]);
+  const [servings, setServings] = useState<number>(2);
   const [loading, setLoading] = useState(false);
-  
-  // recettes sauvegardées
   const [savedRecipes, setSavedRecipes] = useState<SavedRecipe[]>([]);
   const [expanded, setExpanded] = useState<ExpandedMap>({});
-  
-  // résultat de la génération
   const [displayRecipe, setDisplayRecipe] = useState<string | null>(null);
 
   useEffect(() => {
@@ -100,14 +94,14 @@ export default function RecipesPage() {
     }
     Fin JSON.
 
-    Recette avec ces ingrédients : ${usedIngredients.join(', ')}.
+    Recette avec ces ingrédients : ${usedIngredients.join(', ')}. Pour ${servings} personnes.
     ${usedRestrictions.length ? `Restrictions : ${usedRestrictions.join(', ')}.` : ''}`.trim();
 
     try {
       const llmRes = await fetch('/api/ollama', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, model: 'llama3', options: { temperature: 0.7 } }),
+        body: JSON.stringify({ prompt, model: 'mistral', options: { temperature: 0.7 } }),
       });
       const llmJson = await llmRes.json();
       let content = llmJson.message.content as string;
@@ -115,6 +109,7 @@ export default function RecipesPage() {
       const end   = content.lastIndexOf('}');
       content = content.slice(start, end + 1);
       const payload = JSON.parse(content);
+      payload.servings = servings;
 
       const nutrition = payload.nutrition || {};
       const vitamins = nutrition.vitamins || payload.vitamins || {};
@@ -135,6 +130,7 @@ export default function RecipesPage() {
         `⏱️ Prépa : ${payload.prepTime} min`,
         `🔥 Cuisson : ${payload.cookTime} min`,
         `💪 Difficulté : ${payload.difficulty}`,
+        `🍽️ Pour : ${payload.servings} personne(s)`,
         payload.restrictions.length 
         ? `🚫 Restrictions : ${payload.restrictions.join(', ')}` 
         : null,
@@ -147,7 +143,6 @@ export default function RecipesPage() {
       ].filter(Boolean).join('\n');
       setDisplayRecipe(lines);
 
-      // enregistrement
       const saveRes = await fetch('/api/save-recipe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -216,6 +211,18 @@ export default function RecipesPage() {
               </Button>
             </div>
           </div>
+          {/* Nombre de personnes */}
+          <div>
+            <Label className="text-lg font-semibold">Nombre de personnes</Label>
+            <Input
+              type="number"
+              min="1"
+              value={servings}
+              onChange={(e) => setServings(parseInt(e.target.value))}
+              placeholder="Ex. 2"
+              className="mt-2"
+            />
+          </div>
           {/* Listes sélectionnées */}
           <div className="grid md:grid-cols-2 gap-4">
             {usedIngredients.length > 0 && (
@@ -277,6 +284,7 @@ export default function RecipesPage() {
                       <div>⏱️ Prépa : {recipe.prepTime} min</div>
                       <div>🔥 Cuisson : {recipe.cookTime} min</div>
                       <div>💪 Difficulté : {recipe.difficulty}</div>
+                      <div>🍽️ Portions : {recipe.servings}</div>
                       {resNames.length > 0 && <div>🚫 Restrictions : {resNames.join(', ')}</div>}
                       {ingNames.length > 0 && <div>📝 Ingrédients : {ingNames.join(', ')}</div>}
                       {recipe.nutritionAnalysis && <div>👩‍🍳 Analyse : {recipe.nutritionAnalysis}</div>}

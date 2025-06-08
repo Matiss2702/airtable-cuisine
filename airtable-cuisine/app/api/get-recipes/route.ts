@@ -30,7 +30,7 @@ export async function GET() {
       cookTime:           r.fields.CookTime,
       difficulty:         r.fields.Difficulty,
       ingredientsLinkIds: r.fields.Recipe_Ingredients || [],
-      restrictionsIds:    r.fields.DietaryRestrictions || [],
+      restrictionsIds:    r.fields.Restrictions || [],
     }))
 
     return NextResponse.json(data)
