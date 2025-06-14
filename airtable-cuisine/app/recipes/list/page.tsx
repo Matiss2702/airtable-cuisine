@@ -140,15 +140,23 @@ export default function RecipesList() {
                   {isOpen ? <ChevronUp /> : <ChevronDown />}
                 </div>
                 {isOpen && (
-                  <div className="mt-2 text-xs text-gray-700 space-y-1">
-                    <p className="text-gray-600">{recipe.description}</p>
-                    <div>⏱️ Prépa : {recipe.prepTime} min</div>
-                    <div>🔥 Cuisson : {recipe.cookTime} min</div>
-                    <div>💪 Difficulté : {recipe.difficulty}</div>
-                    <div>🍽️ Portions : {recipe.servings}</div>
-                    {resNames.length > 0 && <div>🚫 Restrictions : {resNames.join(', ')}</div>}
-                    {ingNames.length > 0 && <div>📝 Ingrédients : {ingNames.join(', ')}</div>}
-                    {recipe.nutritionAnalysis && <div>👩‍🍳 Analyse : {recipe.nutritionAnalysis}</div>}
+                  <div className="mt-2 text-sm text-gray-700 space-y-2">
+                    <p className="text-gray-600 whitespace-pre-line">{recipe.description || 'Aucune description fournie.'}</p>
+                    
+                    <div>⏱️ <strong>Préparation</strong> : {recipe.prepTime != null ? `${recipe.prepTime} min` : 'Non spécifié'}</div>
+                    <div>🔥 <strong>Cuisson</strong> : {recipe.cookTime != null ? `${recipe.cookTime} min` : 'Non spécifiée'}</div>
+                    <div>💪 <strong>Difficulté</strong> : {recipe.difficulty || 'Non spécifiée'}</div>
+                    <div>🍽️ <strong>Portions</strong> : {recipe.servings != null ? recipe.servings : 'Non spécifiées'}</div>
+                    
+                    <div>
+                      🚫 <strong>Restrictions</strong> : {resNames.length > 0 ? resNames.join(', ') : 'Aucune'}
+                    </div>
+                    <div>
+                      📝 <strong>Ingrédients</strong> : {ingNames.length > 0 ? ingNames.join(', ') : 'Non spécifiés'}
+                    </div>
+                    <div>
+                      👩‍🍳 <strong>Analyse nutritionnelle</strong> : {recipe.nutritionAnalysis || 'Non fournie'}
+                    </div>
                   </div>
                 )}
               </CardContent>
