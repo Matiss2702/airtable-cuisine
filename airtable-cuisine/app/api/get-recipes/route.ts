@@ -6,7 +6,6 @@ export async function GET() {
     const API_KEY = process.env.AIRTABLE_API_KEY!
     const TABLE   = 'Recipes'
 
-    // On récupère jusqu'à 20 records (pas de tri nécessaire si tu n'as pas CreatedTime)
     const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE}`
     const res = await fetch(url, {
       headers: { Authorization: `Bearer ${API_KEY}` },
@@ -29,7 +28,7 @@ export async function GET() {
       prepTime:           r.fields.PrepTime,
       cookTime:           r.fields.CookTime,
       difficulty:         r.fields.Difficulty,
-      ingredientsLinkIds: r.fields.Recipe_Ingredients || [],
+      ingredientsLinkIds: r.fields.Ingredients || [],
       restrictionsIds:    r.fields.Restrictions || [],
     }))
 

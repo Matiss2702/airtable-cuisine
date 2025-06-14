@@ -25,6 +25,9 @@ export default function RecipesList() {
   const [restrictions, setRestrictions] = useState<{ id: string; name: string }[]>([]);
   const [savedRecipes, setSavedRecipes] = useState<SavedRecipe[]>([]);
   const [expanded, setExpanded] = useState<ExpandedMap>({});
+  const [searchName, setSearchName] = useState('');
+  const [filterIngredients, setFilterIngredients] = useState<string[]>([]);
+  const [filterRestrictions, setFilterRestrictions] = useState<string[]>([]);
 
   useEffect(() => {
     fetch('/api/ingredients').then(r => r.json()).then(setIngredients);
@@ -43,8 +46,86 @@ export default function RecipesList() {
         <a href="/recipes/generate">➕ Créer une nouvelle recette</a>
       </Button>
 
+    {/* Barre de recherche & filtres */}
+    <div className="bg-orange-50 border border-orange-200 p-4 rounded-lg mb-6 space-y-4">
+      <h2 className="text-lg font-semibold text-orange-700">🔎 Rechercher une recette</h2>
+
+    {/* Recherche par nom */}
+      <input
+        type="text"
+        placeholder="Rechercher par nom"
+        className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
+        onChange={e => setSearchName(e.target.value.toLowerCase())}
+      />
+
+    {/* Filtres */}
+      <div className="flex flex-col md:flex-row gap-4">
+      {/* Ingrédients */}
+        <div className="flex-1">
+          <label className="block mb-1 text-sm font-medium text-gray-700">Ingrédients</label>
+          <div className="flex flex-wrap gap-2">
+            {ingredients.map(ing => (
+              <button
+                key={ing.id}
+                onClick={() =>
+                  setFilterIngredients(prev =>
+                    prev.includes(ing.id)
+                      ? prev.filter(i => i !== ing.id)
+                      : [...prev, ing.id]
+                  )
+                }
+                className={`px-3 py-1 rounded-full border ${
+                  filterIngredients.includes(ing.id)
+                    ? 'bg-green-600 text-white border-green-600'
+                    : 'bg-white text-gray-800 border-gray-300'
+                }`}
+              >
+                {ing.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+      {/* Restrictions */}
+        <div className="flex-1">
+          <label className="block mb-1 text-sm font-medium text-gray-700">Restrictions</label>
+          <div className="flex flex-wrap gap-2">
+            {restrictions.map(r => (
+              <button
+                key={r.id}
+                onClick={() =>
+                  setFilterRestrictions(prev =>
+                    prev.includes(r.id)
+                      ? prev.filter(i => i !== r.id)
+                      : [...prev, r.id]
+                  )
+                }
+                className={`px-3 py-1 rounded-full border ${
+                  filterRestrictions.includes(r.id)
+                    ? 'bg-yellow-600 text-white border-yellow-600'
+                    : 'bg-white text-gray-800 border-gray-300'
+                }`}
+              >
+                {r.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+
       <div className="space-y-4">
-        {savedRecipes.map(recipe => {
+      {savedRecipes
+        .filter(recipe => recipe.name.toLowerCase().includes(searchName))
+        .filter(recipe => {
+          const match = filterIngredients.length === 0 || filterIngredients.every(id => recipe.ingredientsLinkIds?.includes(id));
+          return match;
+        })                     
+        .filter(recipe =>
+          filterRestrictions.length === 0 ||
+          recipe.restrictionsIds.some(id => filterRestrictions.includes(id))
+        )        
+        .map(recipe => {
           const isOpen = !!expanded[recipe.id];
           const ingNames = mapIdsToNames(recipe.ingredientsLinkIds, ingredients);
           const resNames = mapIdsToNames(recipe.restrictionsIds, restrictions);
