@@ -24,19 +24,11 @@ export default function Navbar() {
         <ul className="flex items-center space-x-4">
           <li>
             <Button asChild variant="link">
-              <Link href="/recipes" className="text-sm">Recettes</Link>
+              <Link href="/recipes/list" className="text-sm">Recettes</Link>
             </Button>
           </li>
         </ul>
         <ul className="flex items-center space-x-4">
-          <li>
-            <Button asChild>
-              <Link href="/recipes/submit" className="flex items-center gap-2 text-sm">
-                <Plus />
-                Submit Recipe
-              </Link>
-            </Button>
-          </li>
           <li>
             <ModeToggle />
           </li>
