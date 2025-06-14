@@ -123,12 +123,12 @@ ${usedRestrictions.length ? `Restrictions : ${usedRestrictions.join(', ')}` : ''
       const minerals = nutrition.minerals || payload.minerals || {};
 
       const nutritionSummary = `
-Calories: ${nutrition.calories ?? payload.calories} kcal
-Protéines: ${nutrition.proteins ?? payload.proteins} g
-Glucides: ${nutrition.carbohydrates ?? payload.carbohydrates} g
-Lipides: ${nutrition.fats ?? payload.fats} g
-Vitamines: ${Object.entries(vitamins).map(([k, v]) => `${k}: ${v}`).join(', ') || 'N/A'}
-Minéraux: ${Object.entries(minerals).map(([k, v]) => `${k}: ${v}`).join(', ') || 'N/A'}
+        Calories: ${nutrition.calories ?? payload.calories} kcal
+        Protéines: ${nutrition.proteins ?? payload.proteins} g
+        Glucides: ${nutrition.carbohydrates ?? payload.carbohydrates} g
+        Lipides: ${nutrition.fats ?? payload.fats} g
+        Vitamines: ${Object.entries(vitamins).map(([k, v]) => `${k}: ${v}`).join(', ') || 'N/A'}
+        Minéraux: ${Object.entries(minerals).map(([k, v]) => `${k}: ${v}`).join(', ') || 'N/A'}
       `.trim();
 
       const saveRes = await fetch('/api/save-recipe', {
@@ -156,8 +156,8 @@ Minéraux: ${Object.entries(minerals).map(([k, v]) => `${k}: ${v}`).join(', ') |
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50 px-4 py-8">
-      <div className="max-w-4xl mx-auto">
+    <main className="flex justify-center items-start min-h-screen px-4 pt-20">
+    <div className="bg-gradient-to-br from-orange-50 to-yellow-50 p-6 rounded-lg shadow-md w-full max-w-3xl mx-auto">
       <div className="flex items-center gap-3 mb-2">
         <ChefHat className="h-8 w-8 text-orange-600" />
         <h1 className="text-3xl font-bold text-gray-800">Générateur de Recette IA</h1>
@@ -171,8 +171,7 @@ Minéraux: ${Object.entries(minerals).map(([k, v]) => `${k}: ${v}`).join(', ') |
 
 
       {/* Formulaire */}
-      <div className="grid lg:grid-cols-3 gap-6 mb-6">
-        <div className="lg:col-span-2 space-y-6">
+      <div className="w-full space-y-6 mb-6">
           <div>
             <Label className="text-lg font-semibold">Ajouter un ingrédient</Label>
             <div className="flex gap-2 mt-2">
@@ -294,7 +293,6 @@ Minéraux: ${Object.entries(minerals).map(([k, v]) => `${k}: ${v}`).join(', ') |
               Tout effacer
             </Button>
           </div>
-        </div>
       </div>
 
       {/* Affichage de la recette */}

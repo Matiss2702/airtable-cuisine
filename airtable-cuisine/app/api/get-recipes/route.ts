@@ -27,6 +27,7 @@ export async function GET() {
       description:        r.fields.Description,
       prepTime:           r.fields.PrepTime,
       cookTime:           r.fields.CookTime,
+      servings:           r.fields.Servings,
       difficulty:         r.fields.Difficulty,
       ingredientsLinkIds: r.fields.Ingredients || [],
       restrictionsIds:    r.fields.Restrictions || [],

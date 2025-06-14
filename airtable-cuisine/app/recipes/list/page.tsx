@@ -146,8 +146,7 @@ export default function RecipesList() {
                     <div>⏱️ <strong>Préparation</strong> : {recipe.prepTime != null ? `${recipe.prepTime} min` : 'Non spécifié'}</div>
                     <div>🔥 <strong>Cuisson</strong> : {recipe.cookTime != null ? `${recipe.cookTime} min` : 'Non spécifiée'}</div>
                     <div>💪 <strong>Difficulté</strong> : {recipe.difficulty || 'Non spécifiée'}</div>
-                    <div>🍽️ <strong>Portions</strong> : {recipe.servings != null ? recipe.servings : 'Non spécifiées'}</div>
-                    
+                    <div>🍽️ <strong>Portions</strong> : {recipe.servings != null ? `${recipe.servings} personne${recipe.servings > 1 ? 's' : ''}` : 'Non spécifiées'}</div>
                     <div>
                       🚫 <strong>Restrictions</strong> : {resNames.length > 0 ? resNames.join(', ') : 'Aucune'}
                     </div>
