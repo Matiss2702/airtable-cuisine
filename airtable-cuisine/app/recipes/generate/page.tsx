@@ -173,14 +173,16 @@ ${usedRestrictions.length ? `Restrictions : ${usedRestrictions.join(', ')}` : ''
       {/* Formulaire */}
       <div className="w-full space-y-6 mb-6">
           <div>
-            <Label className="text-lg font-semibold">Ajouter un ingrédient</Label>
+          <Label className="text-lg font-semibold text-gray-800 dark:text-black">
+            Ajouter un ingrédient
+          </Label>            
             <div className="flex gap-2 mt-2">
               <Input
                 list="ings"
                 value={selectedIngredient}
                 onChange={(e) => setSelectedIngredient(e.target.value)}
                 placeholder="Ingrédient"
-                className="flex-1"
+                className="flex-1 text-gray-900 dark:text-white bg-white dark:bg-gray-800 placeholder:text-gray-400 dark:placeholder:text-gray-500"
               />
               <datalist id="ings">
                 {ingredients.map((i) => (
@@ -197,14 +199,14 @@ ${usedRestrictions.length ? `Restrictions : ${usedRestrictions.join(', ')}` : ''
           </div>
 
           <div>
-            <Label className="text-lg font-semibold">Ajouter une restriction</Label>
+          <Label className="text-lg font-semibold text-gray-800 dark:text-black">Ajouter une restriction</Label>
             <div className="flex gap-2 mt-2">
               <Input
                 list="ress"
                 value={selectedRestriction}
                 onChange={(e) => setSelectedRestriction(e.target.value)}
                 placeholder="Restriction"
-                className="flex-1"
+                className="flex-1 text-gray-900 dark:text-white bg-white dark:bg-gray-800 placeholder:text-gray-400 dark:placeholder:text-gray-500"
               />
               <datalist id="ress">
                 {restrictions.map((r) => (
@@ -221,14 +223,18 @@ ${usedRestrictions.length ? `Restrictions : ${usedRestrictions.join(', ')}` : ''
           </div>
 
           <div>
-            <Label className="text-lg font-semibold">Nombre de personnes</Label>
+          <Label className="text-lg font-semibold text-gray-800 dark:text-black">
+            Nombre de personnes
+          </Label>
+          <div className="flex gap-2 mt-2">
             <Input
               type="number"
               min={1}
               value={servings}
               onChange={(e) => setServings(parseInt(e.target.value))}
-              className="mt-2"
+              className="flex-1 text-gray-900 dark:text-white bg-white dark:bg-gray-800 placeholder:text-gray-400 dark:placeholder:text-gray-500"
             />
+            </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
@@ -238,7 +244,7 @@ ${usedRestrictions.length ? `Restrictions : ${usedRestrictions.join(', ')}` : ''
                 {usedIngredients.map((i) => (
                   <div
                     key={i}
-                    className="flex justify-between bg-green-100 p-2 rounded mt-2"
+                    className="flex justify-between bg-green-100 p-2 rounded mt-2 dark:text-black"
                   >
                     <span>{i}</span>
                     <Button
@@ -258,7 +264,7 @@ ${usedRestrictions.length ? `Restrictions : ${usedRestrictions.join(', ')}` : ''
                 {usedRestrictions.map((r) => (
                   <div
                     key={r}
-                    className="flex justify-between bg-yellow-100 p-2 rounded mt-2"
+                    className="flex justify-between bg-yellow-100 p-2 rounded mt-2 dark:text-black"
                   >
                     <span>{r}</span>
                     <Button
@@ -289,7 +295,7 @@ ${usedRestrictions.length ? `Restrictions : ${usedRestrictions.join(', ')}` : ''
                 'Générer recette'
               )}
             </Button>
-            <Button onClick={clearAll} variant="outline" className="px-4 py-2">
+            <Button onClick={clearAll} variant="outline" className="px-4 py-2 dark:text-black">
               Tout effacer
             </Button>
           </div>
@@ -298,13 +304,13 @@ ${usedRestrictions.length ? `Restrictions : ${usedRestrictions.join(', ')}` : ''
       {/* Affichage de la recette */}
       {displayRecipe && (
         <Card className="mt-6 shadow-lg">
-          <CardContent className="p-6 text-sm text-gray-700 space-y-2">
+          <CardContent className="p-6 text-sm text-gray-700 dark:text-gray-100 bg-white dark:bg-gray-900 space-y-2">
             <div>🍽️ <strong>Recette</strong> : {displayRecipe.name}</div>
             <div>📜 <strong>Description</strong> : {displayRecipe.description}</div>
             <div>⏱️ <strong>Préparation</strong> : {displayRecipe.prepTime} min</div>
             <div>🔥 <strong>Cuisson</strong> : {displayRecipe.cookTime} min</div>
             <div>💪 <strong>Difficulté</strong> : {displayRecipe.difficulty}</div>
-            <div>🍽️ <strong>Portions</strong> : {displayRecipe.servings}</div>
+            <div>🍽️ <strong>Portions</strong> : {displayRecipe.servings != null ? `${displayRecipe.servings} personne${displayRecipe.servings > 1 ? 's' : ''}` : 'Non spécifiées'}</div>
             {displayRecipe.restrictions.length > 0 && (
               <div>🚫 <strong>Restrictions</strong> : {displayRecipe.restrictions.join(', ')}</div>
             )}
@@ -319,7 +325,7 @@ ${usedRestrictions.length ? `Restrictions : ${usedRestrictions.join(', ')}` : ''
             </div>
             <div>
               📊 <strong>Analyse nutritionnelle</strong> :
-              <pre className="whitespace-pre-wrap font-mono bg-gray-50 p-2 mt-1 rounded">
+              <pre className="whitespace-pre-wrap font-mono bg-gray-50 p-2 mt-1 rounded dark:text-black ">
                 {displayRecipe.nutritionAnalysis}
               </pre>
             </div>
