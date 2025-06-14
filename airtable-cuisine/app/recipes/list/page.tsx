@@ -87,7 +87,7 @@ export default function RecipesList() {
         </div>
 
       {/* Restrictions */}
-        <div className="flex-1">
+        <div className="flex-1 md:ml-5">
           <label className="block mb-1 text-sm font-medium text-gray-700">Restrictions</label>
           <div className="flex flex-wrap gap-2">
             {restrictions.map(r => (
